@@ -5,7 +5,7 @@ namespace CardClass
         public Suit Suit {get;set;}
         public int Value {get;set;}
 
-        private Dictionary<int,int> CardStrength = new()
+        private static readonly Dictionary<int,int> CardStrength = new()
         {
            {1, 11},
            {3, 10},
@@ -19,9 +19,23 @@ namespace CardClass
            {2, 2}
         };
 
-        public int GetCardStrenght()
+        public int GetCardStrength()
         {
             return CardStrength[this.Number];
+        }
+
+        public override string ToString()
+        {
+            string name = Number switch
+            {
+                1 => "Asso (1)",
+                8 => "Fante (8)",
+                9 => "Cavallo (9)",
+                10 => "Re (10)",
+                _ => Number.ToString()
+            };
+
+            return $"{name} di {Suit}";
         }
     }
 

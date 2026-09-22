@@ -14,8 +14,11 @@ namespace DeckClass
             { 9, 3 },
             { 10, 4 }
         };
-
-
+        public Deck()
+        {
+            this.GenerateDeck();
+            this.ShuffleDeck();
+        }
         public void GenerateDeck()
         {
             int index = 0;
@@ -51,12 +54,13 @@ namespace DeckClass
     
         public Card? Draw()
         {
-            return nextCardIndex < 40 ? deck[nextCardIndex++] : null;
+            return nextCardIndex < deck.Length ? deck[nextCardIndex++] : null;
         }
 
-        public Card? DrawBriscola()
+        public Card ShowBriscola()
         {
-            return nextCardIndex < 40 ? deck[nextCardIndex++] : null;
+            //Return the last card
+            return deck[^1];
         }
     }
 }

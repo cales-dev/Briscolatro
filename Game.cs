@@ -4,18 +4,35 @@ using DeckClass;
 
 namespace GameClass
 {
+    public enum GameState
+    {
+        Start,
+        Playing,
+        End
+    }
+    public enum PlayState
+    {
+        WaitingFirstCard,
+        WaitingSecondCard,
+        ResolvingTrick,
+        DrawingCards
+    }
     public class Game
     {
-        Card briscola = new Card();
-        Dictionary<Player,int> score;
-        Random random = new Random();
+
+        private Card Briscola = new Card();
+        private Dictionary<Player,int> Score;
+        private Random random = new Random();
+
+        public GameState State { get; private set; }
+        public PlayState PlayState { get; private set; }
         private Card AskPlayerCard(Player player)
         {
             Console.WriteLine("Scegli una carta:");
 
             for (int j = 0; j < player.Hand.Count; j++)
             {
-                Console.WriteLine($"{j + 1} - {player.Hand[j].Number}  - {player.Hand[j].Suit}");
+                Console.WriteLine($"{j + 1} - {player.Hand[j]}");
             }
             Card selectedCard =new Card();
             string? input = Console.ReadLine();
@@ -34,7 +51,7 @@ namespace GameClass
             Card selectedCard= bot.Hand[index];
 
             Console.WriteLine("Computer gioca: ");
-            Console.WriteLine($"{index} - {bot.Hand[index].Number}  - {bot.Hand[index].Suit}");
+            Console.WriteLine($"{index} - {bot.Hand[index]}");
             
             bot.Hand.RemoveAt(index);
             return selectedCard;
@@ -42,54 +59,60 @@ namespace GameClass
 
         private Player ResolveTrick(Card firstCard, Card secondCard, Player firstPlayer, Player secondPlayer)
         {
-            if (firstCard.Suit == briscola.Suit && secondCard.Suit != briscola.Suit)
+            if (firstCard.Suit == Briscola.Suit && secondCard.Suit != Briscola.Suit)
             {
                 return firstPlayer;
             }
 
-            if (secondCard.Suit == briscola.Suit && firstCard.Suit != briscola.Suit)
+            if (secondCard.Suit == Briscola.Suit && firstCard.Suit != Briscola.Suit)
             {
                 return secondPlayer;
             }
 
             if (firstCard.Suit == secondCard.Suit)
             {
-                return firstCard.GetCardStrenght() > secondCard.GetCardStrenght() ? firstPlayer : secondPlayer;
+                return firstCard.GetCardStrength() > secondCard.GetCardStrength() ? firstPlayer : secondPlayer;
             }
-
+            
             return firstPlayer;
         }
-        
-        private void PlayGame(Player player1, Player player2, Deck deck)
+        private Card PickCard(Player player)
         {
-            for (int i = 0; i < 3; i++)
-            {
-                Card playerCard = AskPlayerCard(player1);
-                Card botCard = ChooseBotCard(player2);
+            return player.GetPlayerType() == PlayerType.Bot ? ChooseBotCard(player) : AskPlayerCard(player);
+        }
+        private Player PlayTrick(Player player1, Player player2)
+        {
+            Card firstCard = PickCard(player1);
+            Card secondCard = PickCard(player2);
 
-                Player result = ResolveTrick(playerCard, botCard, player1, player2);
-                score[result]++;
-                
-                Console.WriteLine(result.GetPlayerName() + " Ha vinto la mano! ");
-            }
+            Player winner = ResolveTrick(firstCard, secondCard, player1, player2);
+
+            Score[winner] += firstCard.Value + secondCard.Value;
+            
+            return winner;
         }  
         public void StartGame()
         {
+            //Deck setup
             Deck deck = new Deck();
-            deck.GenerateDeck();
-            deck.ShuffleDeck();
+            // deck.GenerateDeck();
+            // deck.ShuffleDeck();
 
-            Player player1 = new Player();
-            Player player2 = new Player();
-            player1.SetPlayerName("Player1");
-            player2.SetPlayerName("Computer");
+            //Players setup
+            Player player1 = new Player("Player1", PlayerType.Human);
+            Player player2 = new Player("Player2", PlayerType.Bot);
 
-            score = new()
+            // player1.SetPlayerName("Player1");
+            // player2.SetPlayerName("Computer");
+            // player1.SetPlayerType(PlayerType.Human);
+            // player2.SetPlayerType(PlayerType.Bot);
+
+            Score = new()
             {
                 {player1, 0},
                 {player2, 0}
             };
-
+            //This might be another method{
             for (int i = 0; i < 3; i++)
             {
                 Card? card1 = deck.Draw();
@@ -105,9 +128,36 @@ namespace GameClass
                 }
             }
 
-            briscola = deck.DrawBriscola();
-            Console.WriteLine("La briscola è: " + briscola.Number +" - " + briscola.Suit);
-            PlayGame(player1,player2,deck);
+            Briscola = deck.ShowBriscola();
+            Console.WriteLine("La briscola è: " + Briscola.Number +" - " + Briscola.Suit);
+            //}
+
+            //Setup game
+            (Player firstPlayer, Player secondPlayer) = ChoosePlayerStart(player1,player2);
+
+            while (firstPlayer.Hand.Count > 0 && secondPlayer.Hand.Count > 0)
+            {
+                Player winner = PlayTrick(firstPlayer,secondPlayer);
+                Player loser = winner == firstPlayer ? secondPlayer : firstPlayer;
+                
+                Console.WriteLine(winner.GetPlayerName() + " Ha vinto la mano! ");
+
+                Card? winnerCard = deck.Draw();
+                Card? loserCard = deck.Draw();
+
+                if (winnerCard != null)
+                    winner.AddCard(winnerCard);
+
+                if (loserCard != null)
+                    loser.AddCard(loserCard);
+
+                firstPlayer = winner;
+                secondPlayer = loser;
+            }
+        }
+        private (Player firstPlayer, Player secondPlayer) ChoosePlayerStart(Player player1, Player player2)
+        {     
+            return random.Next(2) == 0 ? (player1, player2) : (player2, player1);
         }
     }
 }
