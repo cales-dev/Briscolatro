@@ -38,12 +38,4 @@ namespace CardClass
             return $"{name} di {Suit}";
         }
     }
-
-    public enum Suit
-    {
-        Denari,
-        Bastoni,
-        Coppe,
-        Spade
-    }
 }

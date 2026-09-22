@@ -3,11 +3,6 @@ using DeckClass;
 
 namespace PlayerClass
 {
-    public enum PlayerType
-    {
-        Human,
-        Bot
-    }
     public class Player
     {
         private string Name="";

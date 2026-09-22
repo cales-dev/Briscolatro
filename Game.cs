@@ -4,27 +4,12 @@ using DeckClass;
 
 namespace GameClass
 {
-    public enum GameState
-    {
-        Start,
-        Playing,
-        End
-    }
-    public enum PlayState
-    {
-        WaitingFirstCard,
-        WaitingSecondCard,
-        ResolvingTrick,
-        DrawingCards
-    }
     public class Game
     {
         private Card Briscola = new Card();
         private Dictionary<Player,int> Score;
         private Random random = new Random();
-
-        public GameState State { get; private set; }
-        public PlayState PlayState { get; private set; }
+        
         public void StartGame()
         {
             //Deck setup
