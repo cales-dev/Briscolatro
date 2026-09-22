@@ -129,7 +129,7 @@ namespace GameClass
             }
 
             Briscola = deck.ShowBriscola();
-            Console.WriteLine("La briscola è: " + Briscola.Number +" - " + Briscola.Suit);
+            Console.WriteLine($"La briscola è:  {Briscola}");
             //}
 
             //Setup game
