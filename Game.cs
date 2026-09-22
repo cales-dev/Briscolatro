@@ -19,13 +19,75 @@ namespace GameClass
     }
     public class Game
     {
-
         private Card Briscola = new Card();
         private Dictionary<Player,int> Score;
         private Random random = new Random();
 
         public GameState State { get; private set; }
         public PlayState PlayState { get; private set; }
+        public void StartGame()
+        {
+            //Deck setup
+            Deck deck = new Deck();
+
+            //Players setup
+            Player player1 = new Player("Player1", PlayerType.Human);
+            Player player2 = new Player("Player2", PlayerType.Bot);
+
+            Score = new()
+            {
+                {player1, 0},
+                {player2, 0}
+            };
+            
+            //This might be another method{
+            for (int i = 0; i < 3; i++)
+            {
+                Card? card1 = deck.Draw();
+                if (card1 != null)
+                {
+                    player1.AddCard(card1);
+                }
+
+                Card? card2 = deck.Draw();
+                if (card2 != null)
+                {
+                    player2.AddCard(card2);
+                }
+            }
+
+            Briscola = deck.ShowBriscola();
+            Console.WriteLine($"La briscola è:  {Briscola}");
+            //}
+
+            //Setup game
+            (Player firstPlayer, Player secondPlayer) = ChoosePlayerStart(player1,player2);
+
+            while (firstPlayer.Hand.Count > 0 && secondPlayer.Hand.Count > 0)
+            {
+                Player winner = PlayTrick(firstPlayer,secondPlayer);
+                Player loser = winner == firstPlayer ? secondPlayer : firstPlayer;
+                
+                Console.WriteLine(winner.GetPlayerName() + " Ha vinto la mano! ");
+
+                Card? winnerCard = deck.Draw();
+                Card? loserCard = deck.Draw();
+
+                if (winnerCard != null)
+                    winner.AddCard(winnerCard);
+
+                if (loserCard != null)
+                    loser.AddCard(loserCard);
+
+                firstPlayer = winner;
+                secondPlayer = loser;
+            }
+            ShowScore(player1, player2);
+        }
+        private (Player firstPlayer, Player secondPlayer) ChoosePlayerStart(Player player1, Player player2)
+        {     
+            return random.Next(2) == 0 ? (player1, player2) : (player2, player1);
+        }
         private Card AskPlayerCard(Player player)
         {
             Console.WriteLine("Scegli una carta:");
@@ -91,73 +153,12 @@ namespace GameClass
             
             return winner;
         }  
-        public void StartGame()
+        private void ShowScore(Player player1, Player player2)
         {
-            //Deck setup
-            Deck deck = new Deck();
-            // deck.GenerateDeck();
-            // deck.ShuffleDeck();
-
-            //Players setup
-            Player player1 = new Player("Player1", PlayerType.Human);
-            Player player2 = new Player("Player2", PlayerType.Bot);
-
-            // player1.SetPlayerName("Player1");
-            // player2.SetPlayerName("Computer");
-            // player1.SetPlayerType(PlayerType.Human);
-            // player2.SetPlayerType(PlayerType.Bot);
-
-            Score = new()
-            {
-                {player1, 0},
-                {player2, 0}
-            };
-            //This might be another method{
-            for (int i = 0; i < 3; i++)
-            {
-                Card? card1 = deck.Draw();
-                if (card1 != null)
-                {
-                    player1.AddCard(card1);
-                }
-
-                Card? card2 = deck.Draw();
-                if (card2 != null)
-                {
-                    player2.AddCard(card2);
-                }
-            }
-
-            Briscola = deck.ShowBriscola();
-            Console.WriteLine($"La briscola è:  {Briscola}");
-            //}
-
-            //Setup game
-            (Player firstPlayer, Player secondPlayer) = ChoosePlayerStart(player1,player2);
-
-            while (firstPlayer.Hand.Count > 0 && secondPlayer.Hand.Count > 0)
-            {
-                Player winner = PlayTrick(firstPlayer,secondPlayer);
-                Player loser = winner == firstPlayer ? secondPlayer : firstPlayer;
-                
-                Console.WriteLine(winner.GetPlayerName() + " Ha vinto la mano! ");
-
-                Card? winnerCard = deck.Draw();
-                Card? loserCard = deck.Draw();
-
-                if (winnerCard != null)
-                    winner.AddCard(winnerCard);
-
-                if (loserCard != null)
-                    loser.AddCard(loserCard);
-
-                firstPlayer = winner;
-                secondPlayer = loser;
-            }
-        }
-        private (Player firstPlayer, Player secondPlayer) ChoosePlayerStart(Player player1, Player player2)
-        {     
-            return random.Next(2) == 0 ? (player1, player2) : (player2, player1);
+            Console.WriteLine(
+                $"{player1.GetPlayerName()}: {Score[player1]} | " +
+                $"{player2.GetPlayerName()}: {Score[player2]}"
+            );
         }
     }
 }
