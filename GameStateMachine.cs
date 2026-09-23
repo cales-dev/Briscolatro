@@ -17,14 +17,27 @@ namespace GameStateClass
         private Random random = new Random();
         public GameState State { get; private set; } = GameState.Start;
         public PlayState PlayState { get; private set; }
+
+        public Player? CurrentPlayer
+        {
+            get
+            {
+                return PlayState switch
+                {
+                    PlayState.WaitingFirstCard => firstPlayer,
+                    PlayState.WaitingSecondCard => secondPlayer,
+                    _ => null
+                };
+            }
+        }
         public void StartGame()
         {
             //Deck setup
-            this.deck = new Deck();
+            deck = new Deck();
 
             //Players setup
-            this.player1 = new Player("Player1", PlayerType.Human);
-            this.player2 = new Player("Player2", PlayerType.Bot);
+            player1 = new Player("Player1", PlayerType.Human);
+            player2 = new Player("Player2", PlayerType.Bot);
 
             score = new()
             {
@@ -35,71 +48,137 @@ namespace GameStateClass
             //This might be another method{
             for (int i = 0; i < 3; i++)
             {
-                Card? card1 = this.deck.Draw();
-                if (card1 != null)
-                {
-                    player1.AddCard(card1);
-                }
-
-                Card? card2 = this.deck.Draw();
-                if (card2 != null)
-                {
-                    player2.AddCard(card2);
-                }
+                DrawCard(player1);
+                DrawCard(player2);
             }
 
-            this.briscola = this.deck.ShowBriscola();
-            Console.WriteLine($"La briscola è:  {this.briscola}");
+            briscola = deck.ShowBriscola();
             
-            (this.firstPlayer, this.secondPlayer) = ChoosePlayerStart(player1,player2);
-            this.State = GameState.Playing;
-            this.PlayState = PlayState.WaitingFirstCard;
+            (firstPlayer, secondPlayer) = ChoosePlayerStart(player1,player2);
+            State = GameState.Playing;
+            PlayState = PlayState.WaitingFirstCard;
         }
         private (Player firstPlayer, Player secondPlayer) ChoosePlayerStart(Player player1, Player player2)
         {     
             return random.Next(2) == 0 ? (player1, player2) : (player2, player1);
         }
-        private void DrawPlayerCards(Player player, int amount)
+        private void DrawCard(Player player)
         {
-            for (int i = 0; i < amount; i++)
+            Card? card = deck.Draw();
+            if (card != null)
             {
-                Card? card = this.deck.Draw();
-                if (card != null)
-                {
-                    player.AddCard(card);
-                }
+                player.AddCard(card);
             }
         }
         public void PlayCard(Player player, Card card)
         {
-            if(this.State != GameState.Playing)
+            if(State != GameState.Playing)
                 return;
 
-            switch (this.PlayState)
+            switch (PlayState)
             {
                 case PlayState.WaitingFirstCard:
-                    if(player != this.firstPlayer)
+                    if(player != firstPlayer)
                         return;
 
                     if(!player.Hand.Remove(card))
                         return;
                     
-                    this.firstCard = card;
-                    this.PlayState = PlayState.WaitingSecondCard;
+                    firstCard = card;
+                    PlayState = PlayState.WaitingSecondCard;
                     break;
                 case PlayState.WaitingSecondCard:
-                    if (player != this.secondPlayer)
+                    if (player != secondPlayer)
                         return;
 
                     if (!player.Hand.Remove(card))
                         return;
                     
-                    this.secondCard = card;
-                    this.PlayState = PlayState.ResolvingTrick;
+                    secondCard = card;
+                    PlayState = PlayState.ResolvingTrick;
                     break;
                 default:
                     return;
             }
+        }
+        private void ResolveCurrentTrick()
+        {
+            if (PlayState != PlayState.ResolvingTrick)
+                return;
+
+            if (firstCard == null || secondCard == null)
+                return;
+
+            Player winner = ResolveTrick(firstCard,secondCard,firstPlayer,secondPlayer);
+
+            Player loser = winner == firstPlayer ? secondPlayer : firstPlayer;
+
+            score[winner] += firstCard.Value + secondCard.Value;
+
+            firstPlayer = winner;
+            secondPlayer = loser;
+
+            PlayState = PlayState.DrawingCards;
+        }
+        private void DrawCards()
+        {
+            if(PlayState != PlayState.DrawingCards)
+                return;
+
+            Card? winnerCard = deck.Draw();
+            Card? loserCard = deck.Draw();
+
+            if (winnerCard != null)
+                firstPlayer.AddCard(winnerCard);
+
+            if (loserCard != null)
+                secondPlayer.AddCard(loserCard);
+
+            firstCard = null;
+            secondCard = null;
+
+            if (firstPlayer.Hand.Count == 0 && secondPlayer.Hand.Count == 0)
+            {
+                State = GameState.End;
+                return;
+            }
+
+            PlayState = PlayState.WaitingFirstCard;
+        }
+        public void Advance()
+        {
+            if (State != GameState.Playing)
+                return;
+
+            switch (PlayState)
+            {
+                case PlayState.ResolvingTrick:
+                    ResolveCurrentTrick();
+                    break;
+
+                case PlayState.DrawingCards:
+                    DrawCards();
+                    break;
+            }
+        }
+        private Player ResolveTrick(Card firstCard, Card secondCard, Player firstPlayer, Player secondPlayer)
+        {
+            if (firstCard.Suit == briscola.Suit && secondCard.Suit != briscola.Suit)
+            {
+                return firstPlayer;
+            }
+
+            if (secondCard.Suit == briscola.Suit && firstCard.Suit != briscola.Suit)
+            {
+                return secondPlayer;
+            }
+
+            if (firstCard.Suit == secondCard.Suit)
+            {
+                return firstCard.GetCardStrength() > secondCard.GetCardStrength() ? firstPlayer : secondPlayer;
+            }
+            
+            return firstPlayer;
         }
     }
 }
