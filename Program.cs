@@ -1,6 +1,6 @@
-﻿using CardClass;
-using GameStateClass;
-using PlayerClass;
+﻿using Briscolatro.Core.Players;
+using Briscolatro.Core.Cards;
+using Briscolatro.Core.GameStateMachine;
 internal class Program
 {
     static void Main(string[] args)
@@ -21,7 +21,7 @@ internal class Program
                     Card card = currentPlayer.Hand[0];
 
                     Console.WriteLine(
-                        $"{currentPlayer.GetPlayerName()} gioca {card}"
+                        $"{currentPlayer.Name} gioca {card}"
                     );
 
                     game.PlayCard(currentPlayer, card);
@@ -33,7 +33,15 @@ internal class Program
                     break;
             }
         }
+        //OLD test purpose
+        // if (game.CurrentScore.Values.Sum() != 120)
+        // {
+        //     throw new Exception("Invalid total score");
+        // }
 
+        // Console.WriteLine(
+        //     $"Total score: {game.CurrentScore.Values.Sum()}"
+        // );
         Console.WriteLine("Partita terminata");
     }
 }
