@@ -85,7 +85,7 @@ public class Game
         if (int.TryParse(input, out int choice))    
         {
             selectedCard = player.Hand[choice - 1];
-            player.Hand.RemoveAt(choice - 1);
+            player.RemoveCard(selectedCard);
         }
 
         return selectedCard;
@@ -98,7 +98,7 @@ public class Game
         Console.WriteLine("Computer gioca: ");
         Console.WriteLine($"{index} - {bot.Hand[index]}");
         
-        bot.Hand.RemoveAt(index);
+        bot.RemoveCard(selectedCard);
         return selectedCard;
     }
 
@@ -143,4 +143,5 @@ public class Game
             $"{player2.Name}: {Score[player2]}"
         );
     }
+    
 }

@@ -52,6 +52,8 @@ public class Game
     }
     public void StartGame(int amount = 3)
     {
+        if (State != GameState.Start)
+            return;
         //This might be another method{
         for (int i = 0; i < amount; i++)
         {
@@ -85,7 +87,7 @@ public class Game
                 if(player != firstPlayer)
                     return;
 
-                if(!player.Hand.Remove(card))
+                if(!player.RemoveCard(card))
                     return;
                 
                 firstCard = card;
@@ -95,7 +97,7 @@ public class Game
                 if (player != secondPlayer)
                     return;
 
-                if (!player.Hand.Remove(card))
+                if (!player.RemoveCard(card))
                     return;
                 
                 secondCard = card;
@@ -183,5 +185,14 @@ public class Game
         }
         
         return firstPlayer;
+    }
+    public int GetFinalScore(Player player)
+    {
+        if(State != GameState.End)
+        {
+            throw new InvalidOperationException( "Score is not available before the game ends.");
+        }
+
+        return score[player];
     }
 }

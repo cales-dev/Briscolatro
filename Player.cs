@@ -7,8 +7,9 @@ namespace Briscolatro.Core.Players
     {
         public string Name {get;}
         public PlayerType Type {get;}
-        public List<Card> Hand { get; set; } = new List<Card>();
-        public int lifes { get; set; } = 3;
+        private readonly List<Card> hand = new List<Card>();
+        public IReadOnlyList<Card> Hand => hand;
+        public int Lifes { get; private set; } = 3;
 
         public Player(string name, PlayerType type)
         {
@@ -17,11 +18,15 @@ namespace Briscolatro.Core.Players
         }
         public void LoseLife()
         {
-            lifes--;
+            Lifes--;
         }
         public void AddCard(Card card)
         {
-            Hand.Add(card);
+            hand.Add(card);
+        }
+        public bool RemoveCard(Card card)
+        {
+            return hand.Remove(card);
         }
     }
 }   
