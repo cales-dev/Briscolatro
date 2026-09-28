@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Briscolatro.Unity/">
+    <Project Path="Briscolatro.Unity/Assembly-CSharp-Editor.csproj" />
+    <Project Path="Briscolatro.Unity/Assembly-CSharp.csproj" />
+  </Folder>
   <Project Path="Briscolatro.Console/Briscolatro.Console.csproj" />
   <Project Path="Briscolatro.Core/Briscolatro.Core.csproj" />
 </Solution>

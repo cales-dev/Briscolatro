@@ -17,7 +17,10 @@ public class Game
     private Random random = new Random();
     public GameState State { get; private set; } = GameState.Start;
     public TrickState PlayState { get; private set; }
-
+    public Card Briscola => briscola;
+    public Player Player1 => player1;
+    public Player Player2 => player2;
+    
     public Player? CurrentPlayer
     {
         get
