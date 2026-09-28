@@ -15,8 +15,8 @@ internal class Program
 
             switch (game.PlayState)
             {
-                case PlayState.WaitingFirstCard:
-                case PlayState.WaitingSecondCard:
+                case TrickState.WaitingFirstCard:
+                case TrickState.WaitingSecondCard:
                     Player currentPlayer = game.CurrentPlayer!;
                     Card card = currentPlayer.Hand[0];
 
@@ -27,8 +27,8 @@ internal class Program
                     game.PlayCard(currentPlayer, card);
                     break;
 
-                case PlayState.ResolvingTrick:
-                case PlayState.DrawingCards:
+                case TrickState.ResolvingTrick:
+                case TrickState.DrawingCards:
                     game.Advance();
                     break;
             }

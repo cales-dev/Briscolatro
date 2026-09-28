@@ -4,7 +4,7 @@ public enum GameState
     Playing,
     End
 }
-public enum PlayState
+public enum TrickState
 {
     WaitingFirstCard,
     WaitingSecondCard,

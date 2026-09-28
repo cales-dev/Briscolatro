@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Briscolatro.Console/Briscolatro.Console.csproj" />
+  <Project Path="Briscolatro.Core/Briscolatro.Core.csproj" />
+</Solution>

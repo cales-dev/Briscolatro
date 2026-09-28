@@ -16,7 +16,7 @@ public class Game
     private Dictionary<Player, int> score;
     private Random random = new Random();
     public GameState State { get; private set; } = GameState.Start;
-    public PlayState PlayState { get; private set; }
+    public TrickState PlayState { get; private set; }
 
     public Player? CurrentPlayer
     {
@@ -24,8 +24,8 @@ public class Game
         {
             return PlayState switch
             {
-                PlayState.WaitingFirstCard => firstPlayer,
-                PlayState.WaitingSecondCard => secondPlayer,
+                TrickState.WaitingFirstCard => firstPlayer,
+                TrickState.WaitingSecondCard => secondPlayer,
                 _ => null
             };
         }
@@ -62,7 +62,7 @@ public class Game
         }
         
         State = GameState.Playing;
-        PlayState = PlayState.WaitingFirstCard;
+        PlayState = TrickState.WaitingFirstCard;
     }
     private (Player firstPlayer, Player secondPlayer) ChoosePlayerStart(Player player1, Player player2)
     {     
@@ -83,7 +83,7 @@ public class Game
 
         switch (PlayState)
         {
-            case PlayState.WaitingFirstCard:
+            case TrickState.WaitingFirstCard:
                 if(player != firstPlayer)
                     return;
 
@@ -91,9 +91,9 @@ public class Game
                     return;
                 
                 firstCard = card;
-                PlayState = PlayState.WaitingSecondCard;
+                PlayState = TrickState.WaitingSecondCard;
                 break;
-            case PlayState.WaitingSecondCard:
+            case TrickState.WaitingSecondCard:
                 if (player != secondPlayer)
                     return;
 
@@ -101,7 +101,7 @@ public class Game
                     return;
                 
                 secondCard = card;
-                PlayState = PlayState.ResolvingTrick;
+                PlayState = TrickState.ResolvingTrick;
                 break;
             default:
                 return;
@@ -109,7 +109,7 @@ public class Game
     }
     private void ResolveCurrentTrick()
     {
-        if (PlayState != PlayState.ResolvingTrick)
+        if (PlayState != TrickState.ResolvingTrick)
             return;
 
         if (firstCard == null || secondCard == null)
@@ -124,11 +124,11 @@ public class Game
         firstPlayer = winner;
         secondPlayer = loser;
 
-        PlayState = PlayState.DrawingCards;
+        PlayState = TrickState.DrawingCards;
     }
     private void DrawCards()
     {
-        if(PlayState != PlayState.DrawingCards)
+        if(PlayState != TrickState.DrawingCards)
             return;
 
         Card? winnerCard = deck.Draw();
@@ -149,7 +149,7 @@ public class Game
             return;
         }
 
-        PlayState = PlayState.WaitingFirstCard;
+        PlayState = TrickState.WaitingFirstCard;
     }
     public void Advance()
     {
@@ -158,11 +158,11 @@ public class Game
 
         switch (PlayState)
         {
-            case PlayState.ResolvingTrick:
+            case TrickState.ResolvingTrick:
                 ResolveCurrentTrick();
                 break;
 
-            case PlayState.DrawingCards:
+            case TrickState.DrawingCards:
                 DrawCards();
                 break;
         }

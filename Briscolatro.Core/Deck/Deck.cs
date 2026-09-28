@@ -23,7 +23,7 @@ public class Deck
         int index = 0;
         nextCardIndex = 0;
 
-        foreach (Suit suit in Enum.GetValues<Suit>())
+        foreach (Suit suit in Enum.GetValues(typeof(Suit)))
         {
             for (int number = 1; number <= 10; number++)
             {

@@ -5,7 +5,7 @@ namespace Briscolatro.Core.Game;
 public class Game
 {
     private Card Briscola = new Card();
-    private Dictionary<Player,int> Score;
+    private Dictionary<Player,int> Score = null!;
     private Random random = new Random();
     
     public void StartGame()
